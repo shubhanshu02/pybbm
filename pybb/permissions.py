@@ -146,9 +146,9 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may unstick `topic` """
         if topic.poll_type == topic.POLL_TYPE_NONE or not is_authenticated(user):
             return False
-        elif user.is_superuser:
+        if user.is_superuser:
             return True
-        elif (
+        if (
             not topic.closed
             and not user.poll_answers.filter(poll_answer__topic=topic).exists()
         ):

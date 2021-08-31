@@ -85,8 +85,7 @@ class RedirectToLoginMixin(object):
                 from django.contrib.auth.views import redirect_to_login
 
                 return redirect_to_login(self.get_login_redirect_url())
-            else:
-                return HttpResponseForbidden()
+            return HttpResponseForbidden()
 
     def get_login_redirect_url(self):
         """ get the url to which we redirect after the user logs in. subclasses should override this """
@@ -502,8 +501,7 @@ class PostEditMixin(PybbFormsMixin):
             self.request.user
         ):
             return self.get_admin_post_form_class()
-        else:
-            return self.get_post_form_class()
+        return self.get_post_form_class()
 
     def get_context_data(self, **kwargs):
 
@@ -833,8 +831,7 @@ class ProfileEditView(generic.UpdateView):
             from pybb.forms import EditProfileForm
 
             return EditProfileForm
-        else:
-            return super(ProfileEditView, self).get_form_class()
+        return super(ProfileEditView, self).get_form_class()
 
     @method_decorator(login_required)
     @method_decorator(csrf_protect)
@@ -866,8 +863,7 @@ class DeletePostView(generic.DeleteView):
         redirect_url = self.get_success_url()
         if not request.is_ajax():
             return HttpResponseRedirect(redirect_url)
-        else:
-            return HttpResponse(redirect_url)
+        return HttpResponse(redirect_url)
 
     def get_success_url(self):
         try:
@@ -877,8 +873,7 @@ class DeletePostView(generic.DeleteView):
         else:
             if not self.request.is_ajax():
                 return self.topic.get_absolute_url()
-            else:
-                return ""
+            return ""
 
 
 class TopicActionBaseView(generic.View):

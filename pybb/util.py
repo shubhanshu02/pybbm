@@ -157,8 +157,7 @@ def get_pybb_profile(user):
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
         return getattr(user, defaults.PYBB_PROFILE_RELATED_NAME)
-    else:
-        return user
+    return user
 
 
 def get_pybb_profile_model():
@@ -168,15 +167,13 @@ def get_pybb_profile_model():
         return compat.get_related_model_class(
             get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME
         )
-    else:
-        return get_user_model()
+    return get_user_model()
 
 
 def build_cache_key(key_name, **kwargs):
     if key_name == "anonymous_topic_views":
         return "pybbm_anonymous_topic_%s_views" % kwargs["topic_id"]
-    else:
-        raise ValueError("Wrong key_name parameter passed: %s" % key_name)
+    raise ValueError("Wrong key_name parameter passed: %s" % key_name)
 
 
 class FilePathGenerator(object):
