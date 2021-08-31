@@ -176,7 +176,7 @@ def build_cache_key(key_name, **kwargs):
     raise ValueError("Wrong key_name parameter passed: %s" % key_name)
 
 
-class FilePathGenerator(object):
+class FilePathGenerator:
     """
     Special class for generating random filenames
     Can be deconstructed for correct migration
