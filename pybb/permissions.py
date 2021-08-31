@@ -59,7 +59,7 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             return True
-        return forum.hidden == False and forum.category.hidden == False
+        return forum.hidden is False and forum.category.hidden is False
 
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
