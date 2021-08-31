@@ -17,7 +17,8 @@ else:  # pragma: no cover
 
 
 class PybbMiddleware(MiddlewareParentClass):
-    def process_request(self, request):
+    @staticmethod
+    def process_request(request):
         if is_authenticated(request.user):
             try:
                 # Here we try to load profile, but can get error

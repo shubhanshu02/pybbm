@@ -18,13 +18,16 @@ from pybb.permissions import perms
 class PybbFeed(Feed):
     feed_type = Atom1Feed
 
-    def link(self):
+    @staticmethod
+    def link():
         return reverse("pybb:index")
 
-    def item_guid(self, obj):
+    @staticmethod
+    def item_guid(obj):
         return str(obj.id)
 
-    def item_pubdate(self, obj):
+    @staticmethod
+    def item_pubdate(obj):
         return obj.created
 
 
@@ -37,7 +40,8 @@ class LastPosts(PybbFeed):
     def get_object(self, request, *args, **kwargs):
         return request.user
 
-    def items(self, user):
+    @staticmethod
+    def items(user):
         ids = [
             p.id
             for p in perms.filter_posts(user, Post.objects.only("id")).order_by(
@@ -58,7 +62,8 @@ class LastTopics(PybbFeed):
     def get_object(self, request, *args, **kwargs):
         return request.user
 
-    def items(self, user):
+    @staticmethod
+    def items(user):
         return (
             perms.filter_topics(user, Topic.objects.all())
             .select_related("forum")
