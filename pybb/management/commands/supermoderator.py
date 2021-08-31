@@ -14,7 +14,8 @@ class Command(BaseCommand):
         if len(args) != 2:
             raise CommandError("Enter action {add|del} and username")
         action, username = args
-        assert action in ("add", "del")
+        if action not in ("add", "del"):
+            raise AssertionError
         user = compat.get_user_model().objects.get(
             **{compat.get_username_field(): username}
         )
