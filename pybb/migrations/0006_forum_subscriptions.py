@@ -67,6 +67,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="forumsubscription",
-            unique_together=set([("user", "forum")]),
+            unique_together={("user", "forum")},
         ),
     ]

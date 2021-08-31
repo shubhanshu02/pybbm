@@ -28,10 +28,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="forum",
-            unique_together=set([("category", "slug")]),
+            unique_together={("category", "slug")},
         ),
         migrations.AlterUniqueTogether(
             name="topic",
-            unique_together=set([("forum", "slug")]),
+            unique_together={("forum", "slug")},
         ),
     ]
