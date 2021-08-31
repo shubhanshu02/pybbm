@@ -26,7 +26,8 @@ class DefaultPermissionHandler(object):
     #
     # permission checks on categories
     #
-    def filter_categories(self, user, qs):
+    @staticmethod
+    def filter_categories(user, qs):
         """ return a queryset with categories `user` is allowed to see """
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
@@ -34,7 +35,8 @@ class DefaultPermissionHandler(object):
             return qs
         return qs.filter(hidden=False)
 
-    def may_view_category(self, user, category):
+    @staticmethod
+    def may_view_category(user, category):
         """ return True if `user` may view this category, False if not """
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
@@ -45,7 +47,8 @@ class DefaultPermissionHandler(object):
     #
     # permission checks on forums
     #
-    def filter_forums(self, user, qs):
+    @staticmethod
+    def filter_forums(user, qs):
         """ return a queryset with forums `user` is allowed to see """
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
@@ -53,7 +56,8 @@ class DefaultPermissionHandler(object):
             return qs
         return qs.filter(Q(hidden=False) & Q(category__hidden=False))
 
-    def may_view_forum(self, user, forum):
+    @staticmethod
+    def may_view_forum(user, forum):
         """ return True if user may view this forum, False if not """
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
@@ -61,7 +65,8 @@ class DefaultPermissionHandler(object):
             return True
         return forum.hidden == False and forum.category.hidden == False
 
-    def may_create_topic(self, user, forum):
+    @staticmethod
+    def may_create_topic(user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
         if user.is_superuser:
             return True
@@ -70,7 +75,8 @@ class DefaultPermissionHandler(object):
     #
     # permission checks on topics
     #
-    def filter_topics(self, user, qs):
+    @staticmethod
+    def filter_topics(user, qs):
         """ return a queryset with topics `user` is allowed to see """
         if user.is_superuser:
             return qs
@@ -117,7 +123,8 @@ class DefaultPermissionHandler(object):
             not topic.forum.hidden and not topic.forum.category.hidden
         )
 
-    def may_moderate_topic(self, user, topic):
+    @staticmethod
+    def may_moderate_topic(user, topic):
         if user.is_superuser:
             return True
         if not is_authenticated(user):
@@ -142,7 +149,8 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may unstick `topic` """
         return self.may_moderate_topic(user, topic)
 
-    def may_vote_in_topic(self, user, topic):
+    @staticmethod
+    def may_vote_in_topic(user, topic):
         """ return True if `user` may unstick `topic` """
         if topic.poll_type == topic.POLL_TYPE_NONE or not is_authenticated(user):
             return False
@@ -170,7 +178,8 @@ class DefaultPermissionHandler(object):
             return self.may_moderate_topic(user, topic)
         return True
 
-    def may_post_as_admin(self, user):
+    @staticmethod
+    def may_post_as_admin(user):
         """ return True if `user` may post as admin """
         if user.is_superuser:
             return True
@@ -178,14 +187,16 @@ class DefaultPermissionHandler(object):
         # permissions on pybb models. We should add pybb perm test
         return user.is_staff
 
-    def may_subscribe_topic(self, user, topic):
+    @staticmethod
+    def may_subscribe_topic(user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
         return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and is_authenticated(user)
 
     #
     # permission checks on posts
     #
-    def filter_posts(self, user, qs):
+    @staticmethod
+    def filter_posts(user, qs):
         """ return a queryset with posts `user` is allowed to see """
 
         # first filter by topic availability
@@ -237,7 +248,8 @@ class DefaultPermissionHandler(object):
             return True
         return post.user == user or self.may_moderate_post(user, post)
 
-    def may_delete_post(self, user, post):
+    @staticmethod
+    def may_delete_post(user, post):
         """ return True if `user` may delete `post` """
         if user.is_superuser:
             return True
@@ -252,7 +264,8 @@ class DefaultPermissionHandler(object):
         # may_moderate_post if he has change_post perms. For this reason, we need to check
         # if user is really a post's topic moderator.
 
-    def may_admin_post(self, user, post):
+    @staticmethod
+    def may_admin_post(user, post):
         """ return True if `user` may use the admin interface to administrate the `post` """
         if user.is_superuser:
             return True
@@ -261,27 +274,31 @@ class DefaultPermissionHandler(object):
     #
     # permission checks on users
     #
-    def may_block_user(self, user, user_to_block):
+    @staticmethod
+    def may_block_user(user, user_to_block):
         """ return True if `user` may block `user_to_block` """
         if user.is_superuser:
             return True
         return user.has_perm("pybb.block_users")
 
-    def may_attach_files(self, user):
+    @staticmethod
+    def may_attach_files(user):
         """
         return True if `user` may attach files to posts, False otherwise.
         By default controlled by PYBB_ATTACHMENT_ENABLE setting
         """
         return defaults.PYBB_ATTACHMENT_ENABLE
 
-    def may_create_poll(self, user):
+    @staticmethod
+    def may_create_poll(user):
         """
         return True if `user` may add poll to posts, False otherwise.
         By default always True
         """
         return True
 
-    def may_edit_topic_slug(self, user):
+    @staticmethod
+    def may_edit_topic_slug(user):
         """
         returns True if `user` may choose topic's slug, False otherwise.
         When True adds field slug in the Topic form.
@@ -289,7 +306,8 @@ class DefaultPermissionHandler(object):
         """
         return False
 
-    def may_change_forum(self, user, forum):
+    @staticmethod
+    def may_change_forum(user, forum):
         """
         Returns True if the user has the permissions to add modertors to a forum
         By default True if user can change forum
@@ -298,7 +316,8 @@ class DefaultPermissionHandler(object):
             return True
         return user.has_perm("pybb.change_forum")
 
-    def may_manage_moderators(self, user):
+    @staticmethod
+    def may_manage_moderators(user):
         """ return True if `user` may manage moderators"""
         if user.is_superuser:
             return True

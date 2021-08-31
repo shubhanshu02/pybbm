@@ -88,7 +88,8 @@ class RedirectToLoginMixin(object):
             else:
                 return HttpResponseForbidden()
 
-    def get_login_redirect_url(self):
+    @staticmethod
+    def get_login_redirect_url():
         """ get the url to which we redirect after the user logs in. subclasses should override this """
         return "/"
 
@@ -186,7 +187,8 @@ class ForumView(RedirectToLoginMixin, PaginatorMixin, generic.ListView):
         qs = perms.filter_topics(self.request.user, qs)
         return qs
 
-    def get_forum(self, **kwargs):
+    @staticmethod
+    def get_forum(**kwargs):
         if "pk" in kwargs:
             forum = get_object_or_404(Forum.objects.all(), pk=kwargs["pk"])
         elif ("slug" and "category_slug") in kwargs:
@@ -476,7 +478,8 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
                 if not forum_mark_new:
                     forum_mark.save()  # update read time
 
-    def get_topic(self, **kwargs):
+    @staticmethod
+    def get_topic(**kwargs):
         if "pk" in kwargs:
             topic = get_object_or_404(Topic, pk=kwargs["pk"], post_count__gt=0)
         elif ("slug" and "forum_slug" and "category_slug") in kwargs:
@@ -804,7 +807,8 @@ class PostView(RedirectToLoginMixin, generic.RedirectView):
             self.post.id,
         )
 
-    def get_post(self, **kwargs):
+    @staticmethod
+    def get_post(**kwargs):
         return get_object_or_404(Post, pk=kwargs["pk"])
 
 

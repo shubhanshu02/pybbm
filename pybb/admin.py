@@ -184,13 +184,15 @@ class ProfileAdmin(admin.ModelAdmin):
 class AttachmentAdmin(admin.ModelAdmin):
     list_display = ["file", "size", "admin_view_post", "admin_edit_post"]
 
-    def admin_view_post(self, obj):
+    @staticmethod
+    def admin_view_post(obj):
         return '<a href="%s">view</a>' % obj.post.get_absolute_url()
 
     admin_view_post.allow_tags = True
     admin_view_post.short_description = _("View post")
 
-    def admin_edit_post(self, obj):
+    @staticmethod
+    def admin_edit_post(obj):
         return '<a href="%s">edit</a>' % reverse(
             "admin:pybb_post_change", args=[obj.post.pk]
         )
