@@ -57,7 +57,7 @@ class BaseParser(object):
         if not max_ref:
             return text
         refs = [int(ref) for ref in refs if int(ref) <= max_ref]
-        attachments = [a for a in attachments.order_by("pk")[0 : max(refs)]]
+        attachments = list(attachments.order_by("pk")[0 : max(refs)])
         for ref in refs:
             text = text.replace("[file-%d]" % ref, attachments[ref - 1].file.url)
 
