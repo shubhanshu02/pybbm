@@ -37,7 +37,7 @@ class BaseParser(object):
     widget_class = Textarea
 
     def format_attachments(self, text, attachments):
-        """
+        r"""
         Replaces attachment's references ([file-\d+]) inside a text with their related (web) URL
 
         :param text: text which contains attachment's references
@@ -47,7 +47,7 @@ class BaseParser(object):
         :returns: str or unicode with [file-\d+] replaced by related file's (web) URL
         """
 
-        refs = re.findall("\[file-([1-9][0-9]*)\]", text)
+        refs = re.findall(r"\[file-([1-9][0-9]*)\]", text)
         if not refs:
             return text
         refs = sorted(set(refs))
