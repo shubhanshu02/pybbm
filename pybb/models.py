@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
+
 try:
     from django.core.urlresolvers import reverse
 except ImportError:
@@ -13,7 +14,12 @@ from django.utils.html import strip_tags
 from django.utils.translation import ugettext_lazy as _
 from django.utils.timezone import now as tznow
 
-from pybb.compat import get_user_model_path, get_username_field, get_atomic_func, slugify
+from pybb.compat import (
+    get_user_model_path,
+    get_username_field,
+    get_atomic_func,
+    slugify,
+)
 from pybb import defaults
 from pybb.profiles import PybbProfile
 from pybb.util import unescape, FilePathGenerator, _get_markup_formatter
@@ -23,16 +29,19 @@ from annoying.fields import AutoOneToOneField
 
 @python_2_unicode_compatible
 class Category(models.Model):
-    name = models.CharField(_('Name'), max_length=80)
-    position = models.IntegerField(_('Position'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), default=False,
-                                 help_text=_('If checked, this category will be visible only for staff'))
+    name = models.CharField(_("Name"), max_length=80)
+    position = models.IntegerField(_("Position"), blank=True, default=0)
+    hidden = models.BooleanField(
+        _("Hidden"),
+        default=False,
+        help_text=_("If checked, this category will be visible only for staff"),
+    )
     slug = models.SlugField(_("Slug"), max_length=255, unique=True)
 
     class Meta(object):
-        ordering = ['position']
-        verbose_name = _('Category')
-        verbose_name_plural = _('Categories')
+        ordering = ["position"]
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
 
     def __str__(self):
         return self.name
@@ -42,8 +51,13 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         if defaults.PYBB_NICE_URL:
-            return reverse('pybb:category', kwargs={'slug': self.slug, })
-        return reverse('pybb:category', kwargs={'pk': self.id})
+            return reverse(
+                "pybb:category",
+                kwargs={
+                    "slug": self.slug,
+                },
+            )
+        return reverse("pybb:category", kwargs={"pk": self.id})
 
     @property
     def topics(self):
@@ -56,26 +70,41 @@ class Category(models.Model):
 
 @python_2_unicode_compatible
 class Forum(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='forums', verbose_name=_('Category'))
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='child_forums', verbose_name=_('Parent forum'),
-                               blank=True, null=True)
-    name = models.CharField(_('Name'), max_length=80)
-    position = models.IntegerField(_('Position'), blank=True, default=0)
-    description = models.TextField(_('Description'), blank=True)
-    moderators = models.ManyToManyField(get_user_model_path(), blank=True, verbose_name=_('Moderators'))
-    updated = models.DateTimeField(_('Updated'), blank=True, null=True)
-    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    topic_count = models.IntegerField(_('Topic count'), blank=True, default=0)
-    hidden = models.BooleanField(_('Hidden'), default=False)
-    readed_by = models.ManyToManyField(get_user_model_path(), through='ForumReadTracker', related_name='readed_forums')
-    headline = models.TextField(_('Headline'), blank=True, null=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="forums",
+        verbose_name=_("Category"),
+    )
+    parent = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="child_forums",
+        verbose_name=_("Parent forum"),
+        blank=True,
+        null=True,
+    )
+    name = models.CharField(_("Name"), max_length=80)
+    position = models.IntegerField(_("Position"), blank=True, default=0)
+    description = models.TextField(_("Description"), blank=True)
+    moderators = models.ManyToManyField(
+        get_user_model_path(), blank=True, verbose_name=_("Moderators")
+    )
+    updated = models.DateTimeField(_("Updated"), blank=True, null=True)
+    post_count = models.IntegerField(_("Post count"), blank=True, default=0)
+    topic_count = models.IntegerField(_("Topic count"), blank=True, default=0)
+    hidden = models.BooleanField(_("Hidden"), default=False)
+    readed_by = models.ManyToManyField(
+        get_user_model_path(), through="ForumReadTracker", related_name="readed_forums"
+    )
+    headline = models.TextField(_("Headline"), blank=True, null=True)
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
 
     class Meta(object):
-        ordering = ['position']
-        verbose_name = _('Forum')
-        verbose_name_plural = _('Forums')
-        unique_together = ('category', 'slug')
+        ordering = ["position"]
+        verbose_name = _("Forum")
+        verbose_name_plural = _("Forums")
+        unique_together = ("category", "slug")
 
     def __str__(self):
         return self.name
@@ -87,7 +116,7 @@ class Forum(models.Model):
             self.post_count = posts.count()
             if self.post_count:
                 try:
-                    last_post = posts.order_by('-created', '-id')[0]
+                    last_post = posts.order_by("-created", "-id")[0]
                     self.updated = last_post.updated or last_post.created
                 except IndexError:
                     pass
@@ -97,8 +126,11 @@ class Forum(models.Model):
 
     def get_absolute_url(self):
         if defaults.PYBB_NICE_URL:
-            return reverse('pybb:forum', kwargs={'slug': self.slug, 'category_slug': self.category.slug})
-        return reverse('pybb:forum', kwargs={'pk': self.id})
+            return reverse(
+                "pybb:forum",
+                kwargs={"slug": self.slug, "category_slug": self.category.slug},
+            )
+        return reverse("pybb:forum", kwargs={"pk": self.id})
 
     @property
     def posts(self):
@@ -107,7 +139,7 @@ class Forum(models.Model):
     @cached_property
     def last_post(self):
         try:
-            return self.posts.order_by('-created', '-id')[0]
+            return self.posts.order_by("-created", "-id")[0]
         except IndexError:
             return None
 
@@ -129,38 +161,57 @@ class ForumSubscription(models.Model):
     TYPE_NOTIFY = 1
     TYPE_SUBSCRIBE = 2
     TYPE_CHOICES = (
-        (TYPE_NOTIFY, _('be notified only when a new topic is added')),
-        (TYPE_SUBSCRIBE, _('be auto-subscribed to topics')),
+        (TYPE_NOTIFY, _("be notified only when a new topic is added")),
+        (TYPE_SUBSCRIBE, _("be auto-subscribed to topics")),
     )
 
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE,
-        related_name='forum_subscriptions+', verbose_name=_('Subscriber'))
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE,
-        related_name='subscriptions+', verbose_name=_('Forum'))
+    user = models.ForeignKey(
+        get_user_model_path(),
+        on_delete=models.CASCADE,
+        related_name="forum_subscriptions+",
+        verbose_name=_("Subscriber"),
+    )
+    forum = models.ForeignKey(
+        Forum,
+        on_delete=models.CASCADE,
+        related_name="subscriptions+",
+        verbose_name=_("Forum"),
+    )
     type = models.PositiveSmallIntegerField(
-        _('Subscription type'), choices=TYPE_CHOICES,
-        help_text=_((
-            'The auto-subscription works like you manually subscribed to watch each topic :\n'
-            'you will be notified when a topic will receive an answer. \n'
-            'If you choose to be notified only when a new topic is added. It means'
-            'you will be notified only once when the topic is created : '
-            'you won\'t be notified for the answers.'
-        )), )
+        _("Subscription type"),
+        choices=TYPE_CHOICES,
+        help_text=_(
+            (
+                "The auto-subscription works like you manually subscribed to watch each topic :\n"
+                "you will be notified when a topic will receive an answer. \n"
+                "If you choose to be notified only when a new topic is added. It means"
+                "you will be notified only once when the topic is created : "
+                "you won't be notified for the answers."
+            )
+        ),
+    )
 
     class Meta(object):
-        verbose_name = _('Subscription to forum')
-        verbose_name_plural = _('Subscriptions to forums')
-        unique_together = ('user', 'forum',)
+        verbose_name = _("Subscription to forum")
+        verbose_name_plural = _("Subscriptions to forums")
+        unique_together = (
+            "user",
+            "forum",
+        )
 
     def __str__(self):
-        return '%(user)s\'s subscription to "%(forum)s"' % {'user': self.user,
-                                                            'forum': self.forum}
+        return '%(user)s\'s subscription to "%(forum)s"' % {
+            "user": self.user,
+            "forum": self.forum,
+        }
 
     def save(self, all_topics=False, **kwargs):
         if all_topics and self.type == self.TYPE_SUBSCRIBE:
             old = None if not self.pk else ForumSubscription.objects.get(pk=self.pk)
-            if not old or old.type != self.type :
-                topics = Topic.objects.filter(forum=self.forum).exclude(subscribers=self.user)
+            if not old or old.type != self.type:
+                topics = Topic.objects.filter(forum=self.forum).exclude(
+                    subscribers=self.user
+                )
                 self.user.subscriptions.add(*topics)
         super(ForumSubscription, self).save(**kwargs)
 
@@ -170,6 +221,7 @@ class ForumSubscription(models.Model):
             self.user.subscriptions.remove(*topics)
         super(ForumSubscription, self).delete(**kwargs)
 
+
 @python_2_unicode_compatible
 class Topic(models.Model):
     POLL_TYPE_NONE = 0
@@ -177,33 +229,45 @@ class Topic(models.Model):
     POLL_TYPE_MULTIPLE = 2
 
     POLL_TYPE_CHOICES = (
-        (POLL_TYPE_NONE, _('None')),
-        (POLL_TYPE_SINGLE, _('Single answer')),
-        (POLL_TYPE_MULTIPLE, _('Multiple answers')),
+        (POLL_TYPE_NONE, _("None")),
+        (POLL_TYPE_SINGLE, _("Single answer")),
+        (POLL_TYPE_MULTIPLE, _("Multiple answers")),
     )
 
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='topics', verbose_name=_('Forum'))
-    name = models.CharField(_('Subject'), max_length=255)
-    created = models.DateTimeField(_('Created'), null=True, db_index=True)
-    updated = models.DateTimeField(_('Updated'), null=True, db_index=True)
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, verbose_name=_('User'))
-    views = models.IntegerField(_('Views count'), blank=True, default=0)
-    sticky = models.BooleanField(_('Sticky'), default=False)
-    closed = models.BooleanField(_('Closed'), default=False)
-    subscribers = models.ManyToManyField(get_user_model_path(), related_name='subscriptions',
-                                         verbose_name=_('Subscribers'), blank=True)
-    post_count = models.IntegerField(_('Post count'), blank=True, default=0)
-    readed_by = models.ManyToManyField(get_user_model_path(), through='TopicReadTracker', related_name='readed_topics')
-    on_moderation = models.BooleanField(_('On moderation'), default=False)
-    poll_type = models.IntegerField(_('Poll type'), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE)
-    poll_question = models.TextField(_('Poll question'), blank=True, null=True)
+    forum = models.ForeignKey(
+        Forum, on_delete=models.CASCADE, related_name="topics", verbose_name=_("Forum")
+    )
+    name = models.CharField(_("Subject"), max_length=255)
+    created = models.DateTimeField(_("Created"), null=True, db_index=True)
+    updated = models.DateTimeField(_("Updated"), null=True, db_index=True)
+    user = models.ForeignKey(
+        get_user_model_path(), on_delete=models.CASCADE, verbose_name=_("User")
+    )
+    views = models.IntegerField(_("Views count"), blank=True, default=0)
+    sticky = models.BooleanField(_("Sticky"), default=False)
+    closed = models.BooleanField(_("Closed"), default=False)
+    subscribers = models.ManyToManyField(
+        get_user_model_path(),
+        related_name="subscriptions",
+        verbose_name=_("Subscribers"),
+        blank=True,
+    )
+    post_count = models.IntegerField(_("Post count"), blank=True, default=0)
+    readed_by = models.ManyToManyField(
+        get_user_model_path(), through="TopicReadTracker", related_name="readed_topics"
+    )
+    on_moderation = models.BooleanField(_("On moderation"), default=False)
+    poll_type = models.IntegerField(
+        _("Poll type"), choices=POLL_TYPE_CHOICES, default=POLL_TYPE_NONE
+    )
+    poll_question = models.TextField(_("Poll question"), blank=True, null=True)
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255)
 
     class Meta(object):
-        ordering = ['-created']
-        verbose_name = _('Topic')
-        verbose_name_plural = _('Topics')
-        unique_together = ('forum', 'slug')
+        ordering = ["-created"]
+        verbose_name = _("Topic")
+        verbose_name_plural = _("Topics")
+        unique_together = ("forum", "slug")
 
     def __str__(self):
         return self.name
@@ -211,21 +275,28 @@ class Topic(models.Model):
     @cached_property
     def head(self):
         try:
-            return self.posts.all().order_by('created', 'id')[0]
+            return self.posts.all().order_by("created", "id")[0]
         except IndexError:
             return None
 
     @cached_property
     def last_post(self):
         try:
-            return self.posts.order_by('-created', '-id').select_related('user')[0]
+            return self.posts.order_by("-created", "-id").select_related("user")[0]
         except IndexError:
             return None
 
     def get_absolute_url(self):
         if defaults.PYBB_NICE_URL:
-            return reverse('pybb:topic', kwargs={'slug': self.slug, 'forum_slug': self.forum.slug, 'category_slug': self.forum.category.slug})
-        return reverse('pybb:topic', kwargs={'pk': self.id})
+            return reverse(
+                "pybb:topic",
+                kwargs={
+                    "slug": self.slug,
+                    "forum_slug": self.forum.slug,
+                    "category_slug": self.forum.category.slug,
+                },
+            )
+        return reverse("pybb:topic", kwargs={"pk": self.id})
 
     def save(self, *args, **kwargs):
         if self.id is None:
@@ -251,7 +322,7 @@ class Topic(models.Model):
     def update_counters(self):
         self.post_count = self.posts.count()
         # force cache overwrite to get the real latest updated post
-        if hasattr(self, 'last_post'):
+        if hasattr(self, "last_post"):
             del self.last_post
         if self.last_post:
             self.updated = self.last_post.updated or self.last_post.created
@@ -280,9 +351,9 @@ class RenderableItem(models.Model):
     class Meta(object):
         abstract = True
 
-    body = models.TextField(_('Message'))
-    body_html = models.TextField(_('HTML version'))
-    body_text = models.TextField(_('Text version'))
+    body = models.TextField(_("Message"))
+    body_html = models.TextField(_("HTML version"))
+    body_text = models.TextField(_("Text version"))
 
     def render(self):
         self.body_html = _get_markup_formatter()(self.body, instance=self)
@@ -294,21 +365,30 @@ class RenderableItem(models.Model):
 
 @python_2_unicode_compatible
 class Post(RenderableItem):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='posts', verbose_name=_('Topic'))
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, related_name='posts', verbose_name=_('User'))
-    created = models.DateTimeField(_('Created'), blank=True, db_index=True)
-    updated = models.DateTimeField(_('Updated'), blank=True, null=True, db_index=True)
-    user_ip = models.GenericIPAddressField(_('User IP'), blank=True, null=True, default='0.0.0.0')
-    on_moderation = models.BooleanField(_('On moderation'), default=False)
+    topic = models.ForeignKey(
+        Topic, on_delete=models.CASCADE, related_name="posts", verbose_name=_("Topic")
+    )
+    user = models.ForeignKey(
+        get_user_model_path(),
+        on_delete=models.CASCADE,
+        related_name="posts",
+        verbose_name=_("User"),
+    )
+    created = models.DateTimeField(_("Created"), blank=True, db_index=True)
+    updated = models.DateTimeField(_("Updated"), blank=True, null=True, db_index=True)
+    user_ip = models.GenericIPAddressField(
+        _("User IP"), blank=True, null=True, default="0.0.0.0"
+    )
+    on_moderation = models.BooleanField(_("On moderation"), default=False)
 
     class Meta(object):
-        ordering = ['created']
-        verbose_name = _('Post')
-        verbose_name_plural = _('Posts')
+        ordering = ["created"]
+        verbose_name = _("Post")
+        verbose_name_plural = _("Posts")
 
     def summary(self):
         limit = 50
-        tail = len(self.body) > limit and '...' or ''
+        tail = len(self.body) > limit and "..." or ""
         return self.body[:limit] + tail
 
     def __str__(self):
@@ -336,7 +416,11 @@ class Post(RenderableItem):
         super(Post, self).save(*args, **kwargs)
 
         # If post is topic head and moderated, moderate topic too
-        if self.topic.head == self and not self.on_moderation and self.topic.on_moderation:
+        if (
+            self.topic.head == self
+            and not self.on_moderation
+            and self.topic.on_moderation
+        ):
             self.topic.on_moderation = False
 
         self.topic.update_counters()
@@ -347,11 +431,11 @@ class Post(RenderableItem):
             old_post.topic.forum.update_counters()
 
     def get_absolute_url(self):
-        return reverse('pybb:post', kwargs={'pk': self.id})
+        return reverse("pybb:post", kwargs={"pk": self.id})
 
     def delete(self, *args, **kwargs):
         self_id = self.id
-        head_post_id = self.topic.posts.order_by('created', 'id')[0].id
+        head_post_id = self.topic.posts.order_by("created", "id")[0].id
 
         if self_id == head_post_id:
             self.topic.delete()
@@ -364,7 +448,11 @@ class Post(RenderableItem):
         """
         Used in templates for breadcrumb building
         """
-        return self.topic.forum.category, self.topic.forum, self.topic,
+        return (
+            self.topic.forum.category,
+            self.topic.forum,
+            self.topic,
+        )
 
 
 class Profile(PybbProfile):
@@ -372,16 +460,22 @@ class Profile(PybbProfile):
     Profile class that can be used if you doesn't have
     your site profile.
     """
+
     user = AutoOneToOneField(
-        get_user_model_path(), on_delete=models.CASCADE,
-        related_name='pybb_profile', verbose_name=_('User'))
+        get_user_model_path(),
+        on_delete=models.CASCADE,
+        related_name="pybb_profile",
+        verbose_name=_("User"),
+    )
 
     class Meta(object):
-        verbose_name = _('Profile')
-        verbose_name_plural = _('Profiles')
+        verbose_name = _("Profile")
+        verbose_name_plural = _("Profiles")
 
     def get_absolute_url(self):
-        return reverse('pybb:user', kwargs={'username': getattr(self.user, get_username_field())})
+        return reverse(
+            "pybb:user", kwargs={"username": getattr(self.user, get_username_field())}
+        )
 
     def get_display_name(self):
         return self.user.get_username()
@@ -389,13 +483,19 @@ class Profile(PybbProfile):
 
 class Attachment(models.Model):
     class Meta(object):
-        verbose_name = _('Attachment')
-        verbose_name_plural = _('Attachments')
+        verbose_name = _("Attachment")
+        verbose_name_plural = _("Attachments")
 
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('Post'), related_name='attachments')
-    size = models.IntegerField(_('Size'))
-    file = models.FileField(_('File'),
-                            upload_to=FilePathGenerator(to=defaults.PYBB_ATTACHMENT_UPLOAD_TO))
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        verbose_name=_("Post"),
+        related_name="attachments",
+    )
+    size = models.IntegerField(_("Size"))
+    file = models.FileField(
+        _("File"), upload_to=FilePathGenerator(to=defaults.PYBB_ATTACHMENT_UPLOAD_TO)
+    )
 
     def save(self, *args, **kwargs):
         self.size = self.file.size
@@ -404,11 +504,11 @@ class Attachment(models.Model):
     def size_display(self):
         size = self.size
         if size < 1024:
-            return '%db' % size
+            return "%db" % size
         elif size < 1024 * 1024:
-            return '%dKb' % int(size / 1024)
+            return "%dKb" % int(size / 1024)
         else:
-            return '%.2fMb' % (size / float(1024 * 1024))
+            return "%.2fMb" % (size / float(1024 * 1024))
 
 
 class TopicReadTrackerManager(models.Manager):
@@ -437,16 +537,19 @@ class TopicReadTracker(models.Model):
     """
     Save per user topic read tracking
     """
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, blank=False, null=False)
+
+    user = models.ForeignKey(
+        get_user_model_path(), on_delete=models.CASCADE, blank=False, null=False
+    )
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
     objects = TopicReadTrackerManager()
 
     class Meta(object):
-        verbose_name = _('Topic read tracker')
-        verbose_name_plural = _('Topic read trackers')
-        unique_together = ('user', 'topic')
+        verbose_name = _("Topic read tracker")
+        verbose_name_plural = _("Topic read trackers")
+        unique_together = ("user", "topic")
 
 
 class ForumReadTrackerManager(models.Manager):
@@ -475,26 +578,34 @@ class ForumReadTracker(models.Model):
     """
     Save per user forum read tracking
     """
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, blank=False, null=False)
+
+    user = models.ForeignKey(
+        get_user_model_path(), on_delete=models.CASCADE, blank=False, null=False
+    )
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE, blank=True, null=True)
     time_stamp = models.DateTimeField(auto_now=True)
 
     objects = ForumReadTrackerManager()
 
     class Meta(object):
-        verbose_name = _('Forum read tracker')
-        verbose_name_plural = _('Forum read trackers')
-        unique_together = ('user', 'forum')
+        verbose_name = _("Forum read tracker")
+        verbose_name_plural = _("Forum read trackers")
+        unique_together = ("user", "forum")
 
 
 @python_2_unicode_compatible
 class PollAnswer(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='poll_answers', verbose_name=_('Topic'))
-    text = models.CharField(max_length=255, verbose_name=_('Text'))
+    topic = models.ForeignKey(
+        Topic,
+        on_delete=models.CASCADE,
+        related_name="poll_answers",
+        verbose_name=_("Topic"),
+    )
+    text = models.CharField(max_length=255, verbose_name=_("Text"))
 
     class Meta:
-        verbose_name = _('Poll answer')
-        verbose_name_plural = _('Polls answers')
+        verbose_name = _("Poll answer")
+        verbose_name_plural = _("Polls answers")
 
     def __str__(self):
         return self.text
@@ -512,17 +623,32 @@ class PollAnswer(models.Model):
 
 @python_2_unicode_compatible
 class PollAnswerUser(models.Model):
-    poll_answer = models.ForeignKey(PollAnswer, on_delete=models.CASCADE, related_name='users', verbose_name=_('Poll answer'))
-    user = models.ForeignKey(get_user_model_path(), on_delete=models.CASCADE, related_name='poll_answers', verbose_name=_('User'))
+    poll_answer = models.ForeignKey(
+        PollAnswer,
+        on_delete=models.CASCADE,
+        related_name="users",
+        verbose_name=_("Poll answer"),
+    )
+    user = models.ForeignKey(
+        get_user_model_path(),
+        on_delete=models.CASCADE,
+        related_name="poll_answers",
+        verbose_name=_("User"),
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = _('Poll answer user')
-        verbose_name_plural = _('Polls answers users')
-        unique_together = (('poll_answer', 'user', ), )
+        verbose_name = _("Poll answer user")
+        verbose_name_plural = _("Polls answers users")
+        unique_together = (
+            (
+                "poll_answer",
+                "user",
+            ),
+        )
 
     def __str__(self):
-        return '%s - %s' % (self.poll_answer.topic, self.user)
+        return "%s - %s" % (self.poll_answer.topic, self.user)
 
 
 def create_or_check_slug(instance, model, **extra_filters):
@@ -541,15 +667,24 @@ def create_or_check_slug(instance, model, **extra_filters):
         count += 1
 
         if count >= defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT:
-            msg = _('After %(limit)s attemps, there is not any unique slug value for "%(slug)s"')
-            raise ValidationError(msg % {'limit': defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT,
-                                         'slug': initial_slug})
+            msg = _(
+                'After %(limit)s attemps, there is not any unique slug value for "%(slug)s"'
+            )
+            raise ValidationError(
+                msg
+                % {
+                    "limit": defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT,
+                    "slug": initial_slug,
+                }
+            )
 
         count_len = len(str(count))
 
         if last_count_len != count_len:
             last_count_len = count_len
-            filters = {'slug__startswith': initial_slug[:(254-count_len)], }
+            filters = {
+                "slug__startswith": initial_slug[: (254 - count_len)],
+            }
             if extra_filters:
                 filters.update(extra_filters)
             objs = model.objects.filter(**filters).exclude(pk=instance.pk)
@@ -558,7 +693,7 @@ def create_or_check_slug(instance, model, **extra_filters):
         if count == 0:
             slug = initial_slug
         else:
-            slug = '%s-%d' % (initial_slug[:(254-count_len)], count)
+            slug = "%s-%d" % (initial_slug[: (254 - count_len)], count)
         slug_is_not_unique = slug in slug_list
 
     return slug

@@ -10,7 +10,11 @@ from django.forms import Textarea
 
 def smile_it(s):
     for smile, url in PYBB_SMILES.items():
-        s = s.replace(smile, '<img src="%s%s%s" alt="smile" />' % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url))
+        s = s.replace(
+            smile,
+            '<img src="%s%s%s" alt="smile" />'
+            % (settings.STATIC_URL, PYBB_SMILES_PREFIX, url),
+        )
     return s
 
 
@@ -18,7 +22,7 @@ def filter_blanks(user, str):
     """
     Replace more than 3 blank lines with only 1 blank line
     """
-    return re.sub(r'\n{2}\n+', '\n', str)
+    return re.sub(r"\n{2}\n+", "\n", str)
 
 
 def rstrip_str(user, str):
@@ -26,7 +30,7 @@ def rstrip_str(user, str):
     Replace strings with spaces (tabs, etc..) only with newlines
     Remove blank line at the end
     """
-    return '\n'.join([s.rstrip() for s in str.splitlines()])
+    return "\n".join([s.rstrip() for s in str.splitlines()])
 
 
 class BaseParser(object):
@@ -43,7 +47,7 @@ class BaseParser(object):
         :returns: str or unicode with [file-\d+] replaced by related file's (web) URL
         """
 
-        refs = re.findall( '\[file-([1-9][0-9]*)\]', text)
+        refs = re.findall("\[file-([1-9][0-9]*)\]", text)
         if not refs:
             return text
         refs = sorted(set(refs))
@@ -52,9 +56,9 @@ class BaseParser(object):
         if not max_ref:
             return text
         refs = [int(ref) for ref in refs if int(ref) <= max_ref]
-        attachments = [a for a  in attachments.order_by('pk')[0:max(refs)]]
+        attachments = [a for a in attachments.order_by("pk")[0 : max(refs)]]
         for ref in refs:
-            text = text.replace('[file-%d]' % ref, attachments[ref-1].file.url)
+            text = text.replace("[file-%d]" % ref, attachments[ref - 1].file.url)
 
         return text
 
@@ -63,7 +67,7 @@ class BaseParser(object):
             text = self.format_attachments(text, attachments=instance.attachments.all())
         return escape(text)
 
-    def quote(self, text, username=''):
+    def quote(self, text, username=""):
         return text
 
     @classmethod

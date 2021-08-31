@@ -1,1 +1,1 @@
-default_app_config = 'pybb.apps.PybbConfig'
+default_app_config = "pybb.apps.PybbConfig"

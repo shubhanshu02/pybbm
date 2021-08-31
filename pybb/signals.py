@@ -10,28 +10,30 @@ from pybb.permissions import perms
 
 
 def topic_saved(instance, **kwargs):
-    if kwargs['created']:
+    if kwargs["created"]:
         notify_forum_subscribers(instance)
+
 
 def post_saved(instance, **kwargs):
     # signal triggered by loaddata command, ignore
-    if kwargs.get('raw', False):
+    if kwargs.get("raw", False):
         return
 
-    if getattr(instance, '_post_saved_done', False):
-        #Do not spam users when post is saved more than once in a same request.
-        #For eg, when we parse attachments.
+    if getattr(instance, "_post_saved_done", False):
+        # Do not spam users when post is saved more than once in a same request.
+        # For eg, when we parse attachments.
         return
 
     instance._post_saved_done = True
     if not defaults.PYBB_DISABLE_NOTIFICATIONS:
         notify_topic_subscribers(instance)
 
-        if util.get_pybb_profile(instance.user).autosubscribe and \
-            perms.may_subscribe_topic(instance.user, instance.topic):
+        if util.get_pybb_profile(
+            instance.user
+        ).autosubscribe and perms.may_subscribe_topic(instance.user, instance.topic):
             instance.topic.subscribers.add(instance.user)
 
-    if kwargs['created']:
+    if kwargs["created"]:
         profile = util.get_pybb_profile(instance.user)
         profile.post_count = instance.user.posts.count()
         profile.save()
@@ -43,7 +45,7 @@ def post_deleted(instance, **kwargs):
     try:
         profile = util.get_pybb_profile(instance.user)
     except (Profile.DoesNotExist, User.DoesNotExist) as e:
-        #When we cascade delete an user, profile and posts are also deleted
+        # When we cascade delete an user, profile and posts are also deleted
         pass
     else:
         profile.post_count = instance.user.posts.count()
@@ -52,15 +54,19 @@ def post_deleted(instance, **kwargs):
 
 def user_saved(instance, created, **kwargs):
     # signal triggered by loaddata command, ignore
-    if kwargs.get('raw', False):
+    if kwargs.get("raw", False):
         return
 
     if not created:
         return
 
     try:
-        add_post_permission = Permission.objects.get_by_natural_key('add_post', 'pybb', 'post')
-        add_topic_permission = Permission.objects.get_by_natural_key('add_topic', 'pybb', 'topic')
+        add_post_permission = Permission.objects.get_by_natural_key(
+            "add_post", "pybb", "post"
+        )
+        add_topic_permission = Permission.objects.get_by_natural_key(
+            "add_topic", "pybb", "topic"
+        )
     except (Permission.DoesNotExist, ContentType.DoesNotExist):
         return
     instance.user_permissions.add(add_post_permission, add_topic_permission)
@@ -74,24 +80,33 @@ def user_saved(instance, created, **kwargs):
 
 
 def get_save_slug(extra_field=None):
-    '''
+    """
     Returns a function to add or make an instance's slug unique
 
     :param extra_field: field needed in case of a unique_together.
-    '''
+    """
     if extra_field:
+
         def save_slug(**kwargs):
             extra_filters = {}
-            extra_filters[extra_field] = getattr(kwargs.get('instance'), extra_field)
-            kwargs['instance'].slug = create_or_check_slug(kwargs['instance'], kwargs['sender'], **extra_filters)
+            extra_filters[extra_field] = getattr(kwargs.get("instance"), extra_field)
+            kwargs["instance"].slug = create_or_check_slug(
+                kwargs["instance"], kwargs["sender"], **extra_filters
+            )
+
     else:
+
         def save_slug(**kwargs):
-            kwargs['instance'].slug = create_or_check_slug(kwargs['instance'], kwargs['sender'])
+            kwargs["instance"].slug = create_or_check_slug(
+                kwargs["instance"], kwargs["sender"]
+            )
+
     return save_slug
 
+
 pre_save_category_slug = get_save_slug()
-pre_save_forum_slug = get_save_slug('category')
-pre_save_topic_slug = get_save_slug('forum')
+pre_save_forum_slug = get_save_slug("category")
+pre_save_topic_slug = get_save_slug("forum")
 
 
 def setup():

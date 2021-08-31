@@ -12,6 +12,7 @@ if django.VERSION < (1, 10):  # pragma: no cover
     MiddlewareParentClass = object
 else:  # pragma: no cover
     from django.utils.deprecation import MiddlewareMixin
+
     MiddlewareParentClass = MiddlewareMixin
 
 
@@ -29,6 +30,7 @@ class PybbMiddleware(MiddlewareParentClass):
                 # It should be caused rarely, so we move import signal here
                 # to prevent circular import
                 from pybb.signals import user_saved
+
                 user_saved(request.user, created=True)
                 profile = util.get_pybb_profile(request.user)
 
@@ -36,6 +38,6 @@ class PybbMiddleware(MiddlewareParentClass):
                 profile.language = translation.get_language_from_request(request)
                 profile.save()
 
-            request.session['django_language'] = profile.language
+            request.session["django_language"] = profile.language
             translation.activate(profile.language)
             request.LANGUAGE_CODE = translation.get_language()

@@ -14,12 +14,12 @@ def fill_slugs(apps, schema_editor):
         category.save()
 
     for forum in Forum.objects.all():
-        extra_filters = {'category': forum.category}
+        extra_filters = {"category": forum.category}
         forum.slug = create_or_check_slug(instance=forum, model=Forum, **extra_filters)
         forum.save()
 
     for topic in Topic.objects.all():
-        extra_filters = {'forum': topic.forum}
+        extra_filters = {"forum": topic.forum}
         topic.slug = create_or_check_slug(instance=topic, model=Topic, **extra_filters)
         topic.save()
 
@@ -29,15 +29,15 @@ def clear_slugs(apps, schema_editor):
     Forum = apps.get_model("pybb", "Forum")
     Topic = apps.get_model("pybb", "Topic")
 
-    Category.objects.all().update(slug='')
-    Forum.objects.all().update(slug='')
-    Topic.objects.all().update(slug='')
+    Category.objects.all().update(slug="")
+    Forum.objects.all().update(slug="")
+    Topic.objects.all().update(slug="")
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pybb', '0002_slugs_optional'),
+        ("pybb", "0002_slugs_optional"),
     ]
 
     operations = [
