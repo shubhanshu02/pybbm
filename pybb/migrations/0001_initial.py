@@ -602,7 +602,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="topicreadtracker",
-            unique_together=set([("user", "topic")]),
+            unique_together={("user", "topic")},
         ),
         migrations.AddField(
             model_name="topic",
@@ -659,7 +659,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="pollansweruser",
-            unique_together=set([("poll_answer", "user")]),
+            unique_together={("poll_answer", "user")},
         ),
         migrations.AddField(
             model_name="pollanswer",
@@ -674,7 +674,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="forumreadtracker",
-            unique_together=set([("user", "forum")]),
+            unique_together={("user", "forum")},
         ),
         migrations.AddField(
             model_name="forum",
