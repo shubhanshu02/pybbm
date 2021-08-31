@@ -12,8 +12,10 @@ from pybb import compat
 
 from pybb.compat import get_username_field, get_user_model, is_authenticated
 from pybb.defaults import (
-    PYBB_MARKUP, PYBB_MARKUP_ENGINES_PATHS,
-    PYBB_MARKUP_ENGINES, PYBB_QUOTE_ENGINES
+    PYBB_MARKUP,
+    PYBB_MARKUP_ENGINES_PATHS,
+    PYBB_MARKUP_ENGINES,
+    PYBB_QUOTE_ENGINES,
 )
 from pybb.markup.base import BaseParser
 
@@ -22,24 +24,26 @@ _MARKUP_ENGINES = {}
 _MARKUP_ENGINES_FORMATTERS = {}
 _MARKUP_ENGINES_QUOTERS = {}
 
-deprecated_func_warning = ('Deprecated function. Please configure correctly the PYBB_MARKUP_ENGINES_PATHS and'
-                           'use get_markup_engine().%(replace)s() instead of %(old)s()(content).'
-                           'In the next major release, this function will be deleted.')
+deprecated_func_warning = (
+    "Deprecated function. Please configure correctly the PYBB_MARKUP_ENGINES_PATHS and"
+    "use get_markup_engine().%(replace)s() instead of %(old)s()(content)."
+    "In the next major release, this function will be deleted."
+)
 
 
 def resolve_class(name):
     """ resolves a class function given as string, returning the function """
     if not name:
         return None
-    modname, funcname = name.rsplit('.', 1)
+    modname, funcname = name.rsplit(".", 1)
     return getattr(import_module(modname), funcname)()
 
 
 def resolve_function(path):
     if path:
-        path = path.split('.')
+        path = path.split(".")
         to_import = path.pop()
-        module = import_module('.'.join(path))
+        module = import_module(".".join(path))
         if module:
             return getattr(module, to_import)
     return None
@@ -72,8 +76,10 @@ def _get_markup_formatter(name=None):
     """
     Returns the named parse engine, or the default parser if name is not given.
     """
-    warnings.warn(deprecated_func_warning % {'replace': 'format', 'old': '_get_markup_formatter'},
-                  DeprecationWarning)
+    warnings.warn(
+        deprecated_func_warning % {"replace": "format", "old": "_get_markup_formatter"},
+        DeprecationWarning,
+    )
     name = name or PYBB_MARKUP
 
     engine = _MARKUP_ENGINES_FORMATTERS.get(name)
@@ -96,8 +102,10 @@ def _get_markup_quoter(name=None):
     """
     Returns the named quote engine, or the default quoter if name is not given.
     """
-    warnings.warn(deprecated_func_warning % {'replace': 'quote', 'old': '_get_markup_quoter'},
-                  DeprecationWarning)
+    warnings.warn(
+        deprecated_func_warning % {"replace": "quote", "old": "_get_markup_quoter"},
+        DeprecationWarning,
+    )
     name = name or PYBB_MARKUP
 
     engine = _MARKUP_ENGINES_QUOTERS.get(name)
@@ -124,7 +132,13 @@ def unescape(text):
     """
     Do reverse escaping.
     """
-    escape_map = [('&amp;', '&'), ('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&#39;', '\'')]
+    escape_map = [
+        ("&amp;", "&"),
+        ("&lt;", "<"),
+        ("&gt;", ">"),
+        ("&quot;", '"'),
+        ("&#39;", "'"),
+    ]
     for escape_values in escape_map:
         text = text.replace(*escape_values)
     return text
@@ -135,9 +149,11 @@ def get_pybb_profile(user):
 
     if not is_authenticated(user):
         if defaults.PYBB_ENABLE_ANONYMOUS_POST:
-            user = get_user_model().objects.get(**{get_username_field(): defaults.PYBB_ANONYMOUS_USERNAME})
+            user = get_user_model().objects.get(
+                **{get_username_field(): defaults.PYBB_ANONYMOUS_USERNAME}
+            )
         else:
-            raise ValueError(_('Can\'t get profile for anonymous user'))
+            raise ValueError(_("Can't get profile for anonymous user"))
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
         return getattr(user, defaults.PYBB_PROFILE_RELATED_NAME)
@@ -149,16 +165,18 @@ def get_pybb_profile_model():
     from pybb import defaults
 
     if defaults.PYBB_PROFILE_RELATED_NAME:
-        return compat.get_related_model_class(get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME)
+        return compat.get_related_model_class(
+            get_user_model(), defaults.PYBB_PROFILE_RELATED_NAME
+        )
     else:
         return get_user_model()
 
 
 def build_cache_key(key_name, **kwargs):
-    if key_name == 'anonymous_topic_views':
-        return 'pybbm_anonymous_topic_%s_views' % kwargs['topic_id']
+    if key_name == "anonymous_topic_views":
+        return "pybbm_anonymous_topic_%s_views" % kwargs["topic_id"]
     else:
-        raise ValueError('Wrong key_name parameter passed: %s' % key_name)
+        raise ValueError("Wrong key_name parameter passed: %s" % key_name)
 
 
 class FilePathGenerator(object):
@@ -171,7 +189,7 @@ class FilePathGenerator(object):
         self.to = to
 
     def deconstruct(self, *args, **kwargs):
-        return 'pybb.util.FilePathGenerator', [], {'to': self.to}
+        return "pybb.util.FilePathGenerator", [], {"to": self.to}
 
     def __call__(self, instance, filename):
         """
@@ -180,6 +198,6 @@ class FilePathGenerator(object):
         - you don't want to allow others to see original uploaded filenames
         - users can upload images with unicode in filenames wich can confuse browsers and filesystem
         """
-        ext = filename.split('.')[-1]
+        ext = filename.split(".")[-1]
         filename = "%s.%s" % (uuid.uuid4(), ext)
         return os.path.join(self.to, filename)

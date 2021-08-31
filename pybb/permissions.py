@@ -11,17 +11,18 @@ from pybb.compat import is_authenticated
 
 
 class DefaultPermissionHandler(object):
-    """ 
+    """
     Default Permission handler. If you want to implement custom permissions (for example,
     private forums based on some application-specific settings), you can inherit from this
     class and override any of the `filter_*` and `may_*` methods. Methods starting with
     `may` are expected to return `True` or `False`, whereas methods starting with `filter_*`
     should filter the queryset they receive, and return a new queryset containing only the
     objects the user is allowed to see.
-    
+
     To activate your custom permission handler, set `settings.PYBB_PERMISSION_HANDLER` to
-    the full qualified name of your class, e.g. "`myapp.pybb_adapter.MyPermissionHandler`".    
+    the full qualified name of your class, e.g. "`myapp.pybb_adapter.MyPermissionHandler`".
     """
+
     #
     # permission checks on categories
     #
@@ -41,9 +42,9 @@ class DefaultPermissionHandler(object):
             return True
         return not category.hidden
 
-    # 
+    #
     # permission checks on forums
-    # 
+    #
     def filter_forums(self, user, qs):
         """ return a queryset with forums `user` is allowed to see """
         if user.is_superuser or user.is_staff:
@@ -58,22 +59,22 @@ class DefaultPermissionHandler(object):
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
             return True
-        return forum.hidden == False and forum.category.hidden == False 
+        return forum.hidden == False and forum.category.hidden == False
 
     def may_create_topic(self, user, forum):
         """ return True if `user` is allowed to create a new topic in `forum` """
         if user.is_superuser:
             return True
-        return user.has_perm('pybb.add_post')
+        return user.has_perm("pybb.add_post")
 
     #
     # permission checks on topics
-    # 
+    #
     def filter_topics(self, user, qs):
         """ return a queryset with topics `user` is allowed to see """
         if user.is_superuser:
             return qs
-        if user.has_perm('pybb.change_topic'):
+        if user.has_perm("pybb.change_topic"):
             # if I can edit, I can view
             return qs
         if not user.is_staff:
@@ -83,10 +84,12 @@ class DefaultPermissionHandler(object):
         if is_authenticated(user):
             qs = qs.filter(
                 # moderator can view on_moderation
-                Q(forum__moderators=user) |
+                Q(forum__moderators=user)
+                |
                 # author can view on_moderation only if there is one post in the topic
                 # (mean that post is owned by author)
-                Q(user=user, post_count=1) |
+                Q(user=user, post_count=1)
+                |
                 # posts not on_moderation are accessible
                 Q(on_moderation=False)
             )
@@ -110,14 +113,18 @@ class DefaultPermissionHandler(object):
                 return False
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
         # permissions on pybb models. We should add pybb perm test
-        return user.is_staff or (not topic.forum.hidden and not topic.forum.category.hidden)
+        return user.is_staff or (
+            not topic.forum.hidden and not topic.forum.category.hidden
+        )
 
     def may_moderate_topic(self, user, topic):
         if user.is_superuser:
             return True
         if not is_authenticated(user):
             return False
-        return user.has_perm('pybb.change_topic') or user in topic.forum.moderators.all()
+        return (
+            user.has_perm("pybb.change_topic") or user in topic.forum.moderators.all()
+        )
 
     def may_close_topic(self, user, topic):
         """ return True if `user` may close `topic` """
@@ -141,7 +148,10 @@ class DefaultPermissionHandler(object):
             return False
         elif user.is_superuser:
             return True
-        elif not topic.closed and not user.poll_answers.filter(poll_answer__topic=topic).exists():
+        elif (
+            not topic.closed
+            and not user.poll_answers.filter(poll_answer__topic=topic).exists()
+        ):
             return True
         return False
 
@@ -154,12 +164,11 @@ class DefaultPermissionHandler(object):
             return False
         if not self.may_view_topic(user, topic):
             return False
-        if not user.has_perm('pybb.add_post'):
+        if not user.has_perm("pybb.add_post"):
             return False
         if topic.closed or topic.on_moderation:
             return self.may_moderate_topic(user, topic)
         return True
-
 
     def may_post_as_admin(self, user):
         """ return True if `user` may post as admin """
@@ -167,7 +176,7 @@ class DefaultPermissionHandler(object):
             return True
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
         # permissions on pybb models. We should add pybb perm test
-        return user.is_staff  
+        return user.is_staff
 
     def may_subscribe_topic(self, user, topic):
         """ return True if `user` is allowed to subscribe to a `topic` """
@@ -175,14 +184,14 @@ class DefaultPermissionHandler(object):
 
     #
     # permission checks on posts
-    #    
+    #
     def filter_posts(self, user, qs):
         """ return a queryset with posts `user` is allowed to see """
 
         # first filter by topic availability
         if user.is_superuser:
             return qs
-        if user.has_perm('pybb.change_post'):
+        if user.has_perm("pybb.change_post"):
             # If I can edit all posts, I can view all posts
             return qs
         if not user.is_staff:
@@ -205,18 +214,23 @@ class DefaultPermissionHandler(object):
         if self.may_edit_post(user, post):
             # if I can edit, I can view
             return True
-        if defaults.PYBB_PREMODERATION and (post.on_moderation or post.topic.on_moderation):
+        if defaults.PYBB_PREMODERATION and (
+            post.on_moderation or post.topic.on_moderation
+        ):
             return False
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
         # permissions on pybb models. We should add pybb perm test
-        return user.is_staff or (not post.topic.forum.hidden and
-                                 not post.topic.forum.category.hidden)
+        return user.is_staff or (
+            not post.topic.forum.hidden and not post.topic.forum.category.hidden
+        )
 
     def may_moderate_post(self, user, post):
         if user.is_superuser:
             return True
-        return user.has_perm('pybb.change_post') or self.may_moderate_topic(user, post.topic)
-        
+        return user.has_perm("pybb.change_post") or self.may_moderate_topic(
+            user, post.topic
+        )
+
     def may_edit_post(self, user, post):
         """ return True if `user` may edit `post` """
         if user.is_superuser:
@@ -229,19 +243,20 @@ class DefaultPermissionHandler(object):
             return True
         if not is_authenticated(user):
             return False
-        return (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user) or \
-               user.has_perm('pybb.delete_post') or \
-               user in post.topic.forum.moderators.all()
+        return (
+            (defaults.PYBB_ALLOW_DELETE_OWN_POST and post.user == user)
+            or user.has_perm("pybb.delete_post")
+            or user in post.topic.forum.moderators.all()
+        )
         # may_moderate_post does not mean that user is a moderator: a user who is not a moderator
         # may_moderate_post if he has change_post perms. For this reason, we need to check
         # if user is really a post's topic moderator.
-
 
     def may_admin_post(self, user, post):
         """ return True if `user` may use the admin interface to administrate the `post` """
         if user.is_superuser:
             return True
-        return user.is_staff and user.has_perm('pybb.change_post')
+        return user.is_staff and user.has_perm("pybb.change_post")
 
     #
     # permission checks on users
@@ -250,7 +265,7 @@ class DefaultPermissionHandler(object):
         """ return True if `user` may block `user_to_block` """
         if user.is_superuser:
             return True
-        return user.has_perm('pybb.block_users')
+        return user.has_perm("pybb.block_users")
 
     def may_attach_files(self, user):
         """
@@ -281,7 +296,7 @@ class DefaultPermissionHandler(object):
         """
         if user.is_superuser:
             return True
-        return user.has_perm('pybb.change_forum')
+        return user.has_perm("pybb.change_forum")
 
     def may_manage_moderators(self, user):
         """ return True if `user` may manage moderators"""
@@ -290,5 +305,6 @@ class DefaultPermissionHandler(object):
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
         # permissions on pybb models. We should add pybb perm test
         return user.is_staff
+
 
 perms = util.resolve_class(defaults.PYBB_PERMISSION_HANDLER)

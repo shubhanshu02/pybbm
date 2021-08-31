@@ -2,13 +2,15 @@
 # vim:fileencoding=utf-8
 
 from __future__ import unicode_literals
-__author__ = 'zeus'
+
+__author__ = "zeus"
 
 from django.core.management.base import BaseCommand, CommandError
 from pybb.models import Topic, Forum
 
+
 class Command(BaseCommand):
-    help = 'Recalc post counters for forums and topics'
+    help = "Recalc post counters for forums and topics"
 
     def handle(self, *args, **options):
 
