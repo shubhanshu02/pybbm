@@ -58,7 +58,7 @@ def notify_topic_subscribers(post):
 
 def send_notification(users, template, context=None):
     context = context or {}
-    if not "site" in context:
+    if "site" not in context:
         context["site"] = Site.objects.get_current()
     old_lang = translation.get_language()
     from_email = settings.DEFAULT_FROM_EMAIL
