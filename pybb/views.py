@@ -59,7 +59,7 @@ username_field = compat.get_username_field()
 Paginator, pure_pagination = compat.get_paginator_class()
 
 
-class PaginatorMixin(object):
+class PaginatorMixin:
     def get_paginator(
         self, queryset, per_page, orphans=0, allow_empty_first_page=True, **kwargs
     ):
@@ -71,7 +71,7 @@ class PaginatorMixin(object):
         )
 
 
-class RedirectToLoginMixin(object):
+class RedirectToLoginMixin:
     """mixin which redirects to settings.LOGIN_URL if the view encounters an PermissionDenied exception
     and the user is not authenticated. Views inheriting from this need to implement
     get_login_redirect_url(), which returns the URL to redirect to after login (parameter "next")
@@ -284,7 +284,7 @@ class LatestTopicsView(PaginatorMixin, generic.ListView):
         return qs.order_by("-updated", "-id")
 
 
-class PybbFormsMixin(object):
+class PybbFormsMixin:
 
     post_form_class = PostForm
     admin_post_form_class = AdminPostForm

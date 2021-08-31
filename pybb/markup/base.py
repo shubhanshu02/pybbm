@@ -33,7 +33,7 @@ def rstrip_str(user, str):
     return "\n".join([s.rstrip() for s in str.splitlines()])
 
 
-class BaseParser(object):
+class BaseParser:
     widget_class = Textarea
 
     @staticmethod
