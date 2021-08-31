@@ -387,7 +387,7 @@ class Post(RenderableItem):
 
     def summary(self):
         limit = 50
-        tail = len(self.body) > limit and "..." or ""
+        tail = "..." if len(self.body) > limit else ""
         return self.body[:limit] + tail
 
     def __str__(self):
