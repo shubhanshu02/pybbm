@@ -339,8 +339,7 @@ class Topic(models.Model):
     def poll_votes(self):
         if self.poll_type != self.POLL_TYPE_NONE:
             return PollAnswerUser.objects.filter(poll_answer__topic=self).count()
-        else:
-            return None
+        return None
 
 
 class RenderableItem(models.Model):
@@ -505,10 +504,9 @@ class Attachment(models.Model):
         size = self.size
         if size < 1024:
             return "%db" % size
-        elif size < 1024 * 1024:
+        if size < 1024 * 1024:
             return "%dKb" % int(size / 1024)
-        else:
-            return "%.2fMb" % (size / float(1024 * 1024))
+        return "%.2fMb" % (size / float(1024 * 1024))
 
 
 class TopicReadTrackerManager(models.Manager):
@@ -617,8 +615,7 @@ class PollAnswer(models.Model):
         topic_votes = self.topic.poll_votes()
         if topic_votes > 0:
             return 1.0 * self.votes() / topic_votes * 100
-        else:
-            return 0
+        return 0
 
 
 @python_2_unicode_compatible
