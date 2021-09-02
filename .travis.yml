@@ -3,8 +3,9 @@ python:
   - "3.7"
 env:
   - DJANGO="Django>=3.1,<4.0" DB=sqlite
-  - DJANGO="Django>=3.1,<4.0" DB=postgres
-  - DJANGO="Django>=3.1,<4.0" DB=mysql
+  # Enable Later
+  # - DJANGO="Django>=3.1,<4.0" DB=postgres
+  # - DJANGO="Django>=3.1,<4.0" DB=mysql
 
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
