@@ -2792,9 +2792,9 @@ class MarkupParserTest(TestCase, SharedTestModule):
             ],
             [
                 "[url=google.com]search in google[/url]",
-                '<a href="http://google.com">search in google</a>',
+                '<a rel="nofollow" href="http://google.com">search in google</a>',
             ],
-            ["http://google.com", '<a href="http://google.com">http://google.com</a>'],
+            ["http://google.com", '<a rel="nofollow" href="http://google.com">http://google.com</a>'],
             ["[list][*]1[*]2[/list]", "<ul><li>1</li><li>2</li></ul>"],
             [
                 "[list=1][*]1[*]2[/list]",
