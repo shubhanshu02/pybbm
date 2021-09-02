@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals, absolute_import
-
 from markdown import Markdown
 from django.forms import Textarea
 from django.template import Context

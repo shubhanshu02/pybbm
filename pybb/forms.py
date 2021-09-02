@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+
 import re
 import inspect
 
@@ -108,7 +108,12 @@ class PostForm(forms.ModelForm):
         if args:
             kwargs.update(
                 dict(
-                    zip(inspect.getargspec(super(PostForm, self).__init__)[0][1:], args)
+                    list(
+                        zip(
+                            inspect.getargspec(super(PostForm, self).__init__)[0][1:],
+                            args,
+                        )
+                    )
                 )
             )
         self.user = kwargs.pop("user", None)
@@ -370,7 +375,9 @@ class AdminPostForm(PostForm):
     def __init__(self, *args, **kwargs):
         if args:
             kwargs.update(
-                dict(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args))
+                dict(
+                    list(zip(inspect.getargspec(forms.ModelForm.__init__)[0][1:], args))
+                )
             )
         if "instance" in kwargs and kwargs["instance"]:
             kwargs.setdefault("initial", {}).update(
@@ -565,7 +572,7 @@ class ModeratorForm(forms.Form):
         :param target_user: user to update
         """
 
-        cleaned_forums = self.cleaned_data.values()
+        cleaned_forums = list(self.cleaned_data.values())
         initial_forum_set = target_user.forum_set.all()
         # concatenation of the lists into one
         checked_forums = [forum for queryset in cleaned_forums for forum in queryset]

@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
+
 import math
 
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
-
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.contrib import messages
 from django.db.models import F
 from django.forms.utils import ErrorList
@@ -88,7 +84,7 @@ class RedirectToLoginMixin:
             return HttpResponseForbidden()
 
     def get_login_redirect_url(self):
-        """ get the url to which we redirect after the user logs in. subclasses should override this """
+        """get the url to which we redirect after the user logs in. subclasses should override this"""
         return "/"
 
 
@@ -327,10 +323,7 @@ class TopicView(RedirectToLoginMixin, PaginatorMixin, PybbFormsMixin, generic.Li
     def dispatch(self, request, *args, **kwargs):
         self.topic = self.get_topic(**kwargs)
 
-        if (
-            request.GET.get("first-unread")
-            and is_authenticated(request.user)
-        ):
+        if request.GET.get("first-unread") and is_authenticated(request.user):
             read_dates = []
             try:
                 read_dates.append(

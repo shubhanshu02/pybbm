@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
 import datetime, time
 import inspect
 import math
@@ -12,11 +10,7 @@ from django.core import mail
 from django.core.cache import cache
 
 from pybb.compat import is_authenticated, is_anonymous
-
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
@@ -4042,7 +4036,7 @@ class ControlsAndPermissionsTest(TestCase, SharedTestModule):
 
 
 class CustomPermissionHandlerTest(TestCase, SharedTestModule):
-    """ test custom permission handler """
+    """test custom permission handler"""
 
     def setUp(self):
         self.create_user()
@@ -4141,7 +4135,7 @@ class RestrictEditingHandler(permissions.DefaultPermissionHandler):
 
 
 class LogonRedirectTest(TestCase, SharedTestModule):
-    """ test whether anonymous user gets redirected, whereas unauthorized user gets PermissionDenied """
+    """test whether anonymous user gets redirected, whereas unauthorized user gets PermissionDenied"""
 
     def setUp(self):
         # create users
@@ -4171,10 +4165,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         )
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.category.get_absolute_url(), "nostaff", "nostaff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.category.get_absolute_url(), "staff", "staff")
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_forum(self):
         # access without user should be redirected
@@ -4184,10 +4178,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         )
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.forum.get_absolute_url(), "nostaff", "nostaff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.forum.get_absolute_url(), "staff", "staff")
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_topic(self):
         # access without user should be redirected
@@ -4197,10 +4191,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         )
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.topic.get_absolute_url(), "nostaff", "nostaff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.topic.get_absolute_url(), "staff", "staff")
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_post(self):
         # access without user should be redirected
@@ -4210,10 +4204,10 @@ class LogonRedirectTest(TestCase, SharedTestModule):
         )
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(self.post.get_absolute_url(), "nostaff", "nostaff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
         # allowed user is allowed
         r = self.get_with_user(self.post.get_absolute_url(), "staff", "staff")
-        self.assertEquals(r.status_code, 302)
+        self.assertEqual(r.status_code, 302)
 
     @override_settings(PYBB_ENABLE_ANONYMOUS_POST=False)
     def test_redirect_topic_add(self):
@@ -4226,13 +4220,13 @@ class LogonRedirectTest(TestCase, SharedTestModule):
 
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(add_topic_url, "staff", "staff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
 
         _detach_perms_class()
 
         # allowed user is allowed
         r = self.get_with_user(add_topic_url, "staff", "staff")
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_redirect_post_edit(self):
         _attach_perms_class("pybb.tests.RestrictEditingHandler")
@@ -4244,13 +4238,13 @@ class LogonRedirectTest(TestCase, SharedTestModule):
 
         # access with (unauthorized) user should get 403 (forbidden)
         r = self.get_with_user(edit_post_url, "staff", "staff")
-        self.assertEquals(r.status_code, 403)
+        self.assertEqual(r.status_code, 403)
 
         _detach_perms_class()
 
         # allowed user is allowed
         r = self.get_with_user(edit_post_url, "staff", "staff")
-        self.assertEquals(r.status_code, 200)
+        self.assertEqual(r.status_code, 200)
 
     def test_profile_autocreation_signal_on(self):
         user = User.objects.create_user("cronos", "cronos@localhost", "cronos")
@@ -4363,7 +4357,7 @@ class NiceUrlsTest(TestCase, SharedTestModule):
         defaults.PYBB_NICE_URL_SLUG_DUPLICATE_LIMIT = 200
 
         try:
-            for _ in iter(range(200)):
+            for _ in iter(list(range(200))):
                 Topic.objects.create(name="dolly", forum=self.forum, user=self.user)
         except ValidationError as e:
             self.fail(

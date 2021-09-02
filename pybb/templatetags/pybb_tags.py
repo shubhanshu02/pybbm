@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import inspect
 
 import math
@@ -84,14 +83,14 @@ def pybb_user_time(context_time, user):
 
 
 @register.simple_tag
-def pybb_link(object, anchor=""):
+def pybb_link(obj, anchor=""):
     """
     Return A tag with link to object.
     """
 
-    url = hasattr(object, "get_absolute_url") and object.get_absolute_url() or None
+    url = hasattr(obj, "get_absolute_url") and obj.get_absolute_url() or None
     # noinspection PyRedeclaration
-    anchor = anchor or smart_text(object)
+    anchor = anchor or smart_text(obj)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
 
@@ -215,7 +214,7 @@ def pybb_forum_unread(forums, user):
 def pybb_topic_inline_pagination(topic):
     page_count = int(math.ceil(topic.post_count / float(defaults.PYBB_TOPIC_PAGE_SIZE)))
     if page_count <= 5:
-        return range(1, page_count + 1)
+        return list(range(1, page_count + 1))
     return list(range(1, 5)) + ["...", page_count]
 
 

@@ -1,19 +1,8 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
-import django
 from django.utils import translation
 from django.db.models import ObjectDoesNotExist
 from pybb import util
 from pybb.compat import is_authenticated
-
-if django.VERSION < (1, 10):  # pragma: no cover
-    MiddlewareParentClass = object
-else:  # pragma: no cover
-    from django.utils.deprecation import MiddlewareMixin
-
-    MiddlewareParentClass = MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin as MiddlewareParentClass
 
 
 class PybbMiddleware(MiddlewareParentClass):

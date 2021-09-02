@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 import os.path
 import warnings
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.six import string_types
 
 PYBB_TOPIC_PAGE_SIZE = getattr(settings, "PYBB_TOPIC_PAGE_SIZE", 10)
 PYBB_FORUM_PAGE_SIZE = getattr(settings, "PYBB_FORUM_PAGE_SIZE", 20)
@@ -80,10 +79,12 @@ bad_function_warning = "%(bad)s function is deprecated. Use %(good)s instead."
 def getsetting_with_deprecation_check(all_settings, setting_name):  # pragma: no cover
     setting_value = getattr(all_settings, setting_name)
     values = (
-        setting_value if type(setting_value) is not dict else setting_value.values()
+        setting_value
+        if type(setting_value) is not dict
+        else list(setting_value.values())
     )
     for value in values:
-        if isinstance(value, string_types):
+        if isinstance(value, str):
             continue
         warnings.warn(
             callable_warning
