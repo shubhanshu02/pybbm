@@ -1,26 +1,11 @@
 language: python
 python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
+  - "3.7"
 env:
-  - DJANGO="Django>=1.8,<1.9" DB=sqlite
-  - DJANGO="Django>=1.8,<1.9" DB=postgres
-  - DJANGO="Django>=1.8,<1.9" DB=mysql
-  - DJANGO="Django>=1.11,<2.0" DB=sqlite DJANGO_LTS=true
-  - DJANGO="Django>=1.11,<2.0" DB=postgres DJANGO_LTS=true
-  - DJANGO="Django>=1.11,<2.0" DB=mysql DJANGO_LTS=true
-  - DJANGO="Django>=2.0,<2.1" DB=sqlite
-  - DJANGO="Django>=2.0,<2.1" DB=postgres
-  - DJANGO="Django>=2.0,<2.1" DB=mysql
-matrix:
-  exclude:
-    - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.1" DB=sqlite
-    - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.1" DB=postgres
-    - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.1" DB=mysql
+  - DJANGO="Django>=3.1,<4.0" DB=sqlite
+  - DJANGO="Django>=3.1,<4.0" DB=postgres
+  - DJANGO="Django>=3.1,<4.0" DB=mysql
+
 install:
   - if [[ $DB == mysql ]]; then pip install -qU mysqlclient; fi
   - if [[ $DB == postgres ]]; then pip install -qU psycopg2; fi
