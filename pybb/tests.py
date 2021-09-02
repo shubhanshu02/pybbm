@@ -1049,7 +1049,7 @@ class FeaturesTest(TestCase, SharedTestModule):
         client = Client(enforce_csrf_checks=True)
         client.login(username="zeus", password="zeus")
         response = self.create_post_via_http(
-            client, topic_id=self.topic.id, csrfmiddlewaretoken=None
+            client, topic_id=self.topic.id, csrfmiddlewaretoken=""
         )
         self.assertNotEqual(response.status_code, 200)
         response = self.create_post_via_http(client, topic_id=self.topic.id)
