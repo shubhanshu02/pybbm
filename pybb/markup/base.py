@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+
 
 import re
 from django.conf import settings
@@ -9,7 +9,7 @@ from django.forms import Textarea
 
 
 def smile_it(s):
-    for smile, url in PYBB_SMILES.items():
+    for smile, url in list(PYBB_SMILES.items()):
         s = s.replace(
             smile,
             '<img src="%s%s%s" alt="smile" />'

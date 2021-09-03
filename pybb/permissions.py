@@ -3,9 +3,7 @@
 Extensible permission system for pybbm
 """
 
-from __future__ import unicode_literals
 from django.db.models import Q
-
 from pybb import defaults, util
 from pybb.compat import is_authenticated
 
@@ -27,7 +25,7 @@ class DefaultPermissionHandler:
     # permission checks on categories
     #
     def filter_categories(self, user, qs):
-        """ return a queryset with categories `user` is allowed to see """
+        """return a queryset with categories `user` is allowed to see"""
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
@@ -35,7 +33,7 @@ class DefaultPermissionHandler:
         return qs.filter(hidden=False)
 
     def may_view_category(self, user, category):
-        """ return True if `user` may view this category, False if not """
+        """return True if `user` may view this category, False if not"""
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
@@ -46,7 +44,7 @@ class DefaultPermissionHandler:
     # permission checks on forums
     #
     def filter_forums(self, user, qs):
-        """ return a queryset with forums `user` is allowed to see """
+        """return a queryset with forums `user` is allowed to see"""
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
@@ -54,7 +52,7 @@ class DefaultPermissionHandler:
         return qs.filter(Q(hidden=False) & Q(category__hidden=False))
 
     def may_view_forum(self, user, forum):
-        """ return True if user may view this forum, False if not """
+        """return True if user may view this forum, False if not"""
         if user.is_superuser or user.is_staff:
             # FIXME: is_staff only allow user to access /admin but does not mean user has extra
             # permissions on pybb models. We should add pybb perm test
@@ -62,7 +60,7 @@ class DefaultPermissionHandler:
         return forum.hidden is False and forum.category.hidden is False
 
     def may_create_topic(self, user, forum):
-        """ return True if `user` is allowed to create a new topic in `forum` """
+        """return True if `user` is allowed to create a new topic in `forum`"""
         if user.is_superuser:
             return True
         return user.has_perm("pybb.add_post")
@@ -71,7 +69,7 @@ class DefaultPermissionHandler:
     # permission checks on topics
     #
     def filter_topics(self, user, qs):
-        """ return a queryset with topics `user` is allowed to see """
+        """return a queryset with topics `user` is allowed to see"""
         if user.is_superuser:
             return qs
         if user.has_perm("pybb.change_topic"):
@@ -98,7 +96,7 @@ class DefaultPermissionHandler:
         return qs.distinct()
 
     def may_view_topic(self, user, topic):
-        """ return True if user may view this topic, False otherwise """
+        """return True if user may view this topic, False otherwise"""
         if self.may_moderate_topic(user, topic):
             # If i can moderate, it means I can view.
             return True
@@ -127,23 +125,23 @@ class DefaultPermissionHandler:
         )
 
     def may_close_topic(self, user, topic):
-        """ return True if `user` may close `topic` """
+        """return True if `user` may close `topic`"""
         return self.may_moderate_topic(user, topic)
 
     def may_open_topic(self, user, topic):
-        """ return True if `user` may open `topic` """
+        """return True if `user` may open `topic`"""
         return self.may_moderate_topic(user, topic)
 
     def may_stick_topic(self, user, topic):
-        """ return True if `user` may stick `topic` """
+        """return True if `user` may stick `topic`"""
         return self.may_moderate_topic(user, topic)
 
     def may_unstick_topic(self, user, topic):
-        """ return True if `user` may unstick `topic` """
+        """return True if `user` may unstick `topic`"""
         return self.may_moderate_topic(user, topic)
 
     def may_vote_in_topic(self, user, topic):
-        """ return True if `user` may unstick `topic` """
+        """return True if `user` may unstick `topic`"""
         if topic.poll_type == topic.POLL_TYPE_NONE or not is_authenticated(user):
             return False
         if user.is_superuser:
@@ -156,7 +154,7 @@ class DefaultPermissionHandler:
         return False
 
     def may_create_post(self, user, topic):
-        """ return True if `user` is allowed to create a new post in `topic` """
+        """return True if `user` is allowed to create a new post in `topic`"""
 
         if user.is_superuser:
             return True
@@ -171,7 +169,7 @@ class DefaultPermissionHandler:
         return True
 
     def may_post_as_admin(self, user):
-        """ return True if `user` may post as admin """
+        """return True if `user` may post as admin"""
         if user.is_superuser:
             return True
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra
@@ -179,14 +177,14 @@ class DefaultPermissionHandler:
         return user.is_staff
 
     def may_subscribe_topic(self, user, topic):
-        """ return True if `user` is allowed to subscribe to a `topic` """
+        """return True if `user` is allowed to subscribe to a `topic`"""
         return not defaults.PYBB_DISABLE_SUBSCRIPTIONS and is_authenticated(user)
 
     #
     # permission checks on posts
     #
     def filter_posts(self, user, qs):
-        """ return a queryset with posts `user` is allowed to see """
+        """return a queryset with posts `user` is allowed to see"""
 
         # first filter by topic availability
         if user.is_superuser:
@@ -208,7 +206,7 @@ class DefaultPermissionHandler:
         return qs.filter(query).distinct()
 
     def may_view_post(self, user, post):
-        """ return True if `user` may view `post`, False otherwise """
+        """return True if `user` may view `post`, False otherwise"""
         if user.is_superuser:
             return True
         if self.may_edit_post(user, post):
@@ -232,13 +230,13 @@ class DefaultPermissionHandler:
         )
 
     def may_edit_post(self, user, post):
-        """ return True if `user` may edit `post` """
+        """return True if `user` may edit `post`"""
         if user.is_superuser:
             return True
         return post.user == user or self.may_moderate_post(user, post)
 
     def may_delete_post(self, user, post):
-        """ return True if `user` may delete `post` """
+        """return True if `user` may delete `post`"""
         if user.is_superuser:
             return True
         if not is_authenticated(user):
@@ -253,7 +251,7 @@ class DefaultPermissionHandler:
         # if user is really a post's topic moderator.
 
     def may_admin_post(self, user, post):
-        """ return True if `user` may use the admin interface to administrate the `post` """
+        """return True if `user` may use the admin interface to administrate the `post`"""
         if user.is_superuser:
             return True
         return user.is_staff and user.has_perm("pybb.change_post")
@@ -262,7 +260,7 @@ class DefaultPermissionHandler:
     # permission checks on users
     #
     def may_block_user(self, user, user_to_block):
-        """ return True if `user` may block `user_to_block` """
+        """return True if `user` may block `user_to_block`"""
         if user.is_superuser:
             return True
         return user.has_perm("pybb.block_users")
@@ -299,7 +297,7 @@ class DefaultPermissionHandler:
         return user.has_perm("pybb.change_forum")
 
     def may_manage_moderators(self, user):
-        """ return True if `user` may manage moderators"""
+        """return True if `user` may manage moderators"""
         if user.is_superuser:
             return True
         # FIXME: is_staff only allow user to access /admin but does not mean user has extra

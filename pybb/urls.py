@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import unicode_literals
 
 from django.conf.urls import url
 
@@ -70,7 +69,9 @@ urlpatterns += [
     url(r"^topic/(?P<pk>\d+)/$", TopicView.as_view(), name="topic"),
     url(r"^topic/(?P<pk>\d+)/stick/$", StickTopicView.as_view(), name="stick_topic"),
     url(
-        r"^topic/(?P<pk>\d+)/unstick/$", UnstickTopicView.as_view(), name="unstick_topic"
+        r"^topic/(?P<pk>\d+)/unstick/$",
+        UnstickTopicView.as_view(),
+        name="unstick_topic",
     ),
     url(r"^topic/(?P<pk>\d+)/close/$", CloseTopicView.as_view(), name="close_topic"),
     url(r"^topic/(?P<pk>\d+)/open/$", OpenTopicView.as_view(), name="open_topic"),

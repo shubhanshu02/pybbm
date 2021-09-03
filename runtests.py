@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import django
-import sys
 import os
+import sys
+import django
 from optparse import OptionParser
 
 project_dir = os.path.join(

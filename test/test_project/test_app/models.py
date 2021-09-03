@@ -1,10 +1,6 @@
-from __future__ import unicode_literals
-
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
+from django.urls import reverse
 from django.db import models
+from django.utils import timezone
 
 from pybb.compat import get_user_model_path, get_username_field
 from pybb.profiles import PybbProfile
@@ -14,7 +10,6 @@ from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
 )
-from django.utils import timezone
 
 
 class CustomUserManager(BaseUserManager):
