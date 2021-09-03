@@ -36,7 +36,8 @@ def rstrip_str(user, str):
 class BaseParser:
     widget_class = Textarea
 
-    def format_attachments(self, text, attachments):
+    @staticmethod
+    def format_attachments(text, attachments):
         r"""
         Replaces attachment's references ([file-\d+]) inside a text with their related (web) URL
 
@@ -67,7 +68,8 @@ class BaseParser:
             text = self.format_attachments(text, attachments=instance.attachments.all())
         return escape(text)
 
-    def quote(self, text, username=""):
+    @staticmethod
+    def quote(text, username=""):
         return text
 
     @classmethod
