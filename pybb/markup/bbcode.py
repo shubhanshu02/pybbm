@@ -47,7 +47,8 @@ class BBCodeParser(BaseParser):
             "quote", self._render_quote, strip=True, swallow_trailing_newline=True
         )
 
-    def _render_quote(self, name, value, options, parent, context):
+    @staticmethod
+    def _render_quote(name, value, options, parent, context):
         if options and "quote" in options:
             origin_author_html = "<em>%s</em><br>" % options["quote"]
         else:
