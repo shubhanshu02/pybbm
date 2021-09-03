@@ -2406,17 +2406,22 @@ class AttachmentTest(TestCase, SharedTestModule):
     def test_attachment_two(self):
         self.login_client()
         with open(self.file_name, "rb") as fp:
-            with self.assertRaises(ValidationError):
-                self.create_post_via_http(
+            with self.assertRaises(AssertionError):
+                response = self.create_post_via_http(
                     self.client,
                     topic_id=self.topic.id,
                     **{
                         "body": "test attachment",
                         "attachments-0-file": fp,
-                        "attachments-INITIAL_FORMS": None,
-                        "attachments-TOTAL_FORMS": None,
+                        "attachments-INITIAL_FORMS": 0,
+                        "attachments-TOTAL_FORMS": 2,
                     }
                 )
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(Post.objects.filter(body="test attachment").exists())
+                post = Post.objects.filter(body="test attachment")[0]
+                self.assertEqual(post.attachments.count(), 2)
+
 
     def test_attachment_usage(self):
         self.login_client()
