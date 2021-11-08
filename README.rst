@@ -1,7 +1,7 @@
 PyBBM - Django forum solution
 =============================
 
-.. |travis| image:: https://travis-ci.org/hovel/pybbm.png?branch=master
+.. |travis| image:: https://app.travis-ci.com/shubhanshu02/pybbm.svg?branch=master
 .. |coveralls| image:: https://coveralls.io/repos/github/hovel/pybbm/badge.svg?branch=master
 
 |travis| |coveralls|
