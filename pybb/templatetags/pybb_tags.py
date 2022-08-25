@@ -9,7 +9,7 @@ import django
 from django import template
 from django.core.cache import cache
 from django.utils.safestring import mark_safe
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.translation import gettext as _, ungettext
 from django.utils import dateformat
@@ -90,7 +90,7 @@ def pybb_link(obj, anchor=""):
 
     url = hasattr(obj, "get_absolute_url") and obj.get_absolute_url() or None
     # noinspection PyRedeclaration
-    anchor = anchor or smart_text(obj)
+    anchor = anchor or smart_str(obj)
     return mark_safe('<a href="%s">%s</a>' % (url, escape(anchor)))
 
 
