@@ -10,7 +10,7 @@ from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.decorators import method_decorator
 from django.utils.text import Truncator
-from django.utils.translation import ugettext, ugettext_lazy
+from django.utils.translation import ugettext, gettext_lazy
 from django.utils.timezone import now as tznow
 from django.utils.translation import ugettext as _
 
@@ -85,16 +85,16 @@ PollAnswerFormSet = inlineformset_factory(
 
 
 class PostForm(forms.ModelForm):
-    name = forms.CharField(label=ugettext_lazy("Subject"))
+    name = forms.CharField(label=gettext_lazy("Subject"))
     poll_type = forms.TypedChoiceField(
-        label=ugettext_lazy("Poll type"), choices=Topic.POLL_TYPE_CHOICES, coerce=int
+        label=gettext_lazy("Poll type"), choices=Topic.POLL_TYPE_CHOICES, coerce=int
     )
     poll_question = forms.CharField(
-        label=ugettext_lazy("Poll question"),
+        label=gettext_lazy("Poll question"),
         required=False,
         widget=forms.Textarea(attrs={"class": "no-markitup"}),
     )
-    slug = forms.CharField(label=ugettext_lazy("Topic slug"), required=False)
+    slug = forms.CharField(label=gettext_lazy("Topic slug"), required=False)
 
     class Meta(object):
         model = Post
@@ -265,7 +265,7 @@ class MovePostForm(forms.Form):
             choices.insert(0, (0, _("None")))
             choices.insert(0, (-1, _("All")))
             self.fields["number"] = forms.TypedChoiceField(
-                label=ugettext_lazy("Number of following posts to move with"),
+                label=gettext_lazy("Number of following posts to move with"),
                 choices=choices,
                 required=True,
                 coerce=int,
@@ -294,7 +294,7 @@ class MovePostForm(forms.Form):
             choices[-1][1].append((forum.pk, name))
 
         self.fields["move_to"] = forms.ChoiceField(
-            label=ugettext_lazy("Move to forum"),
+            label=gettext_lazy("Move to forum"),
             initial=self.forum.pk,
             choices=choices,
             required=True,
@@ -370,7 +370,7 @@ class AdminPostForm(PostForm):
     If no user with specified name - new user will be created
     """
 
-    login = forms.CharField(label=ugettext_lazy("User"))
+    login = forms.CharField(label=gettext_lazy("User"))
 
     def __init__(self, *args, **kwargs):
         if args:
