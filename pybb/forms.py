@@ -10,9 +10,9 @@ from django.core.exceptions import FieldError, PermissionDenied
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.decorators import method_decorator
 from django.utils.text import Truncator
-from django.utils.translation import ugettext, gettext_lazy
+from django.utils.translation import gettext, gettext_lazy
 from django.utils.timezone import now as tznow
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from pybb import compat, defaults, util, permissions
 from pybb.models import (
@@ -38,7 +38,7 @@ class AttachmentForm(forms.ModelForm):
 
     def clean_file(self):
         if self.cleaned_data["file"].size > defaults.PYBB_ATTACHMENT_SIZE_LIMIT:
-            raise forms.ValidationError(ugettext("Attachment is too big"))
+            raise forms.ValidationError(gettext("Attachment is too big"))
         return self.cleaned_data["file"]
 
 
@@ -62,7 +62,7 @@ class BasePollAnswerFormset(BaseInlineFormSet):
         )
         if forms_cnt > defaults.PYBB_POLL_MAX_ANSWERS:
             raise forms.ValidationError(
-                ugettext(
+                gettext(
                     "You can"
                     "t add more than %s answers for poll"
                     % defaults.PYBB_POLL_MAX_ANSWERS
@@ -70,7 +70,7 @@ class BasePollAnswerFormset(BaseInlineFormSet):
             )
         if forms_cnt < 2:
             raise forms.ValidationError(
-                ugettext("Add two or more answers for this poll")
+                gettext("Add two or more answers for this poll")
             )
 
 
@@ -176,7 +176,7 @@ class PostForm(forms.ModelForm):
             and not poll_question
         ):
             raise forms.ValidationError(
-                ugettext("Poll" "s question is required when adding a poll")
+                gettext("Poll" "s question is required when adding a poll")
             )
 
         return self.cleaned_data
@@ -424,7 +424,7 @@ try:
                 self.cleaned_data["avatar"].size > defaults.PYBB_MAX_AVATAR_SIZE
             ):
                 forms.ValidationError(
-                    ugettext(
+                    gettext(
                         "Avatar is too large, max size: %s bytes"
                         % defaults.PYBB_MAX_AVATAR_SIZE
                     )
